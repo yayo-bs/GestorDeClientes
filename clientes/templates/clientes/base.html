@@ -2,14 +2,19 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    {# Bloque que permite a los templates hijos personalizar el título #}
     <title>{% block titulo %}Gestión de clientes{% endblock %}</title>
 </head>
 <body>
     <header>
         <h1>Gestión de Clientes</h1>
-        <nav><a href="{% url 'lista_clientes' %}">Inicio</a></nav>
+        <nav>
+            {# Enlace de navegación usando el nombre de la URL #}
+            <a href="{% url 'lista_clientes' %}">Inicio</a>
+        </nav>
     </header>
     <main>
+        {# Bloque principal que rellenan los templates hijos #}
         {% block contenido %}{% endblock %}
     </main>
 </body>

@@ -6,6 +6,9 @@
     <h2>{{ cliente.nombre }} {{ cliente.apellidos }}</h2>
     <p><strong>Email:</strong> {{ cliente.email }}</p>
     <p><strong>Teléfono:</strong> {{ cliente.telefono }}</p>
+    {# get_actividad_display muestra el texto legible del campo choices #}
+    <p><strong>Actividad:</strong> {{ cliente.get_actividad_display }}</p>
     <p><strong>Cliente desde:</strong> {{ cliente.fecha_alta }}</p>
+    {# Enlace de vuelta al listado #}
     <a href="{% url 'lista_clientes' %}">← Volver al listado</a>
 {% endblock %}

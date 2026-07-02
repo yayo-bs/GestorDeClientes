@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'clientes',
+    'clientes', # app principal dee gestión de clientes
 ]
 
 MIDDLEWARE = [

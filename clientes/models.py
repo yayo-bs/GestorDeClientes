@@ -2,7 +2,7 @@ from django.db import models
 
 class Cliente(models.Model):
 
-    # Definimos una lista de tuplas para las actividades disponibles. Cada tupla contiene un valor interno y un valor legible para el usuario.
+    # Definimos una lista de tuplas con opciones predefinidas para las actividades.
     ACTIVIDADES = [
         ('danza', 'Danza'),
         ('yoga', 'Yoga'),
@@ -10,13 +10,19 @@ class Cliente(models.Model):
         ('funcional', 'Entrenamiento funcional'),
     ]
     
+    # Datos de identificación del cliente
     nombre = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=150)
-    email = models.EmailField(unique=True)
+
+    # Datos de contacto
+    email = models.EmailField(unique=True)  # unique evita emails duplicados
     telefono = models.CharField(max_length=15)
-    fecha_alta = models.DateField(auto_now_add=True)  # se rellena solo al crear
-    activo = models.BooleanField(default=True)  # para marcar clientes de baja
+
+    # Datos de gestión interna
+    fecha_alta = models.DateField(auto_now_add=True)  # se rellena automáticamente al crear
+    activo = models.BooleanField(default=True)  # permite dar de baja sin borrar el registro
     actividad = models.CharField(max_length=20, choices=ACTIVIDADES, default='danza')
 
     def __str__(self):
+        # Representación legible del objeto en el admin
         return f"{self.nombre} {self.apellidos}"

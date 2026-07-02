@@ -1,11 +1,14 @@
 {% extends 'clientes/base.html' %}
 
+{# Sobreescribimos el bloque título #}
 {% block titulo %}Listado de clientes{% endblock %}
 
 {% block contenido %}
     <ul>
+        {# Iteramos sobre los clientes recibidos desde la vista #}
         {% for cliente in clientes %}
             <li>
+                {# Enlace al detalle pasando el ID del cliente #}
                 <a href="{% url 'detalle_cliente' cliente.id %}">
                     {{ cliente.nombre }} {{ cliente.apellidos }}
                 </a>
