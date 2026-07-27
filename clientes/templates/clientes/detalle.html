@@ -143,9 +143,7 @@
 
     <div class="acciones">
         <a href="{% url 'lista_clientes' %}" class="btn-volver">← Volver al listado</a>
-        
-        {# Descomenta este botón si tienes configurada la URL de edición #}
-        {# <a href="{% url 'editar_cliente' cliente.id %}" class="btn-editar">Editar cliente</a> #}
+        <a href="{% url 'editar_cliente' cliente.id %}" class="btn-editar">Editar cliente</a>
     </div>
 </div>
 {% endblock %}

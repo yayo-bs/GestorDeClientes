@@ -46,10 +46,10 @@
         padding: 0.65rem 0.85rem;
         border: 1px solid var(--beige-accent);
         border-radius: var(--radius-sm);
-        background-color: #faf8f5; /* CORREGIDO: color hexadecimal válido (beige muy claro) */
+        background-color: #faf8f5;
         color: var(--text-main);
         font-size: 0.95rem;
-        font-family: sans-serif;   /* CORREGIDO: asegura tipografía consistente */
+        font-family: sans-serif;
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
@@ -146,8 +146,16 @@
         {% endfor %}
 
         <div class="form-acciones">
-            <a href="{% url 'lista_clientes' %}" class="btn-cancelar">← Cancelar</a>
-            <button type="submit" class="btn-guardar">Guardar cliente</button>
+            <!-- Si estamos editando un cliente existente, volver al detalle; si no, ir al listado -->
+            {% if cliente %}
+                <a href="{% url 'detalle_cliente' cliente.id %}" class="btn-cancelar">← Cancelar</a>
+            {% else %}
+                <a href="{% url 'lista_clientes' %}" class="btn-cancelar">← Cancelar</a>
+            {% endif %}
+
+            <button type="submit" class="btn-guardar">
+                {% if cliente %}Guardar cambios{% else %}Crear cliente{% endif %}
+            </button>
         </div>
     </form>
 </div>
