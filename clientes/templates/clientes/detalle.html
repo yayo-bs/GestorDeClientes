@@ -1,14 +1,151 @@
 {% extends 'clientes/base.html' %}
 
-{% block titulo %}{{ cliente.nombre }}{% endblock %}
+{% block titulo %}{{ cliente.nombre }} {{ cliente.apellidos }}{% endblock %}
 
 {% block contenido %}
-    <h2>{{ cliente.nombre }} {{ cliente.apellidos }}</h2>
-    <p><strong>Email:</strong> {{ cliente.email }}</p>
-    <p><strong>Teléfono:</strong> {{ cliente.telefono }}</p>
-    {# get_actividad_display muestra el texto legible del campo choices #}
-    <p><strong>Actividad:</strong> {{ cliente.get_actividad_display }}</p>
-    <p><strong>Cliente desde:</strong> {{ cliente.fecha_alta }}</p>
-    {# Enlace de vuelta al listado #}
-    <a href="{% url 'lista_clientes' %}">← Volver al listado</a>
+<style>
+    /* Tarjeta contenedora principal */
+    .card-detalle {
+        background-color: var(--bg-card);
+        border: 1px solid var(--beige-accent);
+        border-radius: var(--radius-md);
+        padding: 2rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* Cabecera con el nombre y badge opcional */
+    .detalle-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 1px solid var(--beige-accent);
+        padding-bottom: 1.25rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .detalle-header h2 {
+        color: var(--green-primary);
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    /* Red organizada para los datos */
+    .datos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .dato-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .dato-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        font-weight: 600;
+        margin-bottom: 0.35rem;
+    }
+
+    .dato-valor {
+        font-size: 1.05rem;
+        color: var(--text-main);
+        font-weight: 500;
+        word-break: break-word;
+    }
+
+    /* Zona de botones inferiores */
+    .acciones {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1.25rem;
+        border-top: 1px solid #f0ebe1;
+    }
+
+    .btn-volver {
+        display: inline-block;
+        color: var(--text-muted);
+        background-color: var(--bg-main);
+        border: 1px solid var(--beige-accent);
+        padding: 0.55rem 1.1rem;
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-volver:hover {
+        background-color: var(--beige-accent);
+        color: var(--green-hover);
+    }
+
+    .btn-editar {
+        display: inline-block;
+        background-color: var(--green-primary);
+        color: #ffffff;
+        padding: 0.55rem 1.1rem;
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: background-color 0.2s ease;
+    }
+
+    .btn-editar:hover {
+        background-color: var(--green-hover);
+        color: #ffffff;
+    }
+</style>
+
+<div class="card-detalle">
+    <div class="detalle-header">
+        <h2>{{ cliente.nombre }} {{ cliente.apellidos }}</h2>
+    </div>
+
+    <div class="datos-grid">
+        <div class="dato-item">
+            <span class="dato-label">Email</span>
+            <span class="dato-valor">{{ cliente.email }}</span>
+        </div>
+
+        <div class="dato-item">
+            <span class="dato-label">Teléfono</span>
+            <span class="dato-valor">{{ cliente.telefono }}</span>
+        </div>
+
+        <div class="dato-item">
+            <span class="dato-label">Actividad</span>
+            <span class="dato-valor">{{ cliente.get_actividad_display }}</span>
+        </div>
+
+        <div class="dato-item">
+            <span class="dato-label">Cliente desde</span>
+            <span class="dato-valor">{{ cliente.fecha_alta|date:"d/m/Y" }}</span>
+        </div>
+
+        <div class="dato-item">
+        <span class="dato-label">Próxima cita</span>
+        <span class="dato-valor">
+            {% if cliente.proxima_cita %}
+                {{ cliente.proxima_cita|date:"d/m/Y" }}
+            {% else %}
+                <span style="color: var(--text-muted); font-style: italic;">Sin cita programada</span>
+            {% endif %}
+        </span>
+    </div>
+
+    <div class="acciones">
+        <a href="{% url 'lista_clientes' %}" class="btn-volver">← Volver al listado</a>
+        
+        {# Descomenta este botón si tienes configurada la URL de edición #}
+        {# <a href="{% url 'editar_cliente' cliente.id %}" class="btn-editar">Editar cliente</a> #}
+    </div>
+</div>
 {% endblock %}

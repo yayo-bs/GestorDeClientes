@@ -1,18 +1,134 @@
 {% extends 'clientes/base.html' %}
 
-{# Sobreescribimos el bloque título #}
 {% block titulo %}Listado de clientes{% endblock %}
 
 {% block contenido %}
-    <ul>
-        {# Iteramos sobre los clientes recibidos desde la vista #}
-        {% for cliente in clientes %}
-            <li>
-                {# Enlace al detalle pasando el ID del cliente #}
-                <a href="{% url 'detalle_cliente' cliente.id %}">
-                    {{ cliente.nombre }} {{ cliente.apellidos }}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+<style>
+    /* Cabecera con título y botón principal */
+    .lista-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .lista-header h2 {
+        color: var(--green-primary);
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .btn-crear {
+        display: inline-block;
+        background-color: var(--green-primary);
+        color: #ffffff;
+        padding: 0.6rem 1.2rem;
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: background-color 0.2s ease;
+    }
+
+    .btn-crear:hover {
+        background-color: var(--green-hover);
+        color: #ffffff;
+    }
+
+    /* Contenedor y tabla de clientes */
+    .tabla-contenedor {
+        background-color: var(--bg-card);
+        border: 1px solid var(--beige-accent);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+    }
+
+    .tabla-clientes {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .tabla-clientes th {
+        background-color: #f0ebe1;
+        color: var(--text-muted);
+        font-size: 0.825rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--beige-accent);
+    }
+
+    .tabla-clientes td {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f0ebe1;
+        font-size: 0.95rem;
+    }
+
+    .tabla-clientes tr:last-child td {
+        border-bottom: none;
+    }
+
+    .tabla-clientes tr:hover {
+        background-color: #faf8f5;
+    }
+
+    .enlace-cliente {
+        color: var(--green-primary);
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .enlace-cliente:hover {
+        color: var(--green-hover);
+        text-decoration: underline;
+    }
+
+    /* Estilo para lista vacía */
+    .lista-vacia {
+        padding: 3rem 1.5rem;
+        text-align: center;
+        color: var(--text-muted);
+    }
+</style>
+
+<div class="lista-header">
+    <h2>Clientes</h2>
+    <a href="{% url 'crear_cliente' %}" class="btn-crear">+ Crear nuevo cliente</a>
+</div>
+
+<div class="tabla-contenedor">
+    {% if clientes %}
+        <table class="tabla-clientes">
+            <thead>
+                <tr>
+                    <th>Nombre y Apellidos</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cliente in clientes %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'detalle_cliente' cliente.id %}" class="enlace-cliente">
+                                {{ cliente.nombre }} {{ cliente.apellidos }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{% url 'detalle_cliente' cliente.id %}" class="enlace-cliente" style="font-weight: 500; font-size: 0.85rem;">
+                                Ver detalle →
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="lista-vacia">
+            <p>No hay clientes registrados aún.</p>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

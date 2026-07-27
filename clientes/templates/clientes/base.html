@@ -2,29 +2,152 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    {# Bloque que permite a los templates hijos personalizar el título #}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block titulo %}Gestión de clientes{% endblock %}</title>
+    
+    <style>
+        /* Variables de color y tipografía */
+        :root {
+            --bg-main: #f7f5f0;          /* Beige claro de fondo */
+            --bg-card: #ffffff;          /* Blanco cálido para tarjetas o contenedores */
+            --text-main: #2d332d;        /* Verde muy oscuro casi negro para texto */
+            --text-muted: #5e665e;       /* Gris verdoso para textos secundarios */
+            
+            --green-primary: #2e5a44;    /* Verde bosque / oliva profundo */
+            --green-hover: #224332;      /* Verde más oscuro para estados hover */
+            --green-accent: #88a782;     /* Verde suave para detalles y bordes */
+            --beige-accent: #e8e2d5;     /* Beige medio para bordes y separadores */
+            
+            /* Mensajes de Django */
+            --msg-success-bg: #e2f0d9;
+            --msg-success-text: #1b4317;
+            --msg-error-bg: #f8d7da;
+            --msg-error-text: #721c24;
+            --msg-warning-bg: #fff3cd;
+            --msg-warning-text: #856404;
+
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+        }
+
+        /* Reset básico y cuerpo */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Cabecera / Navbar */
+        header {
+            background-color: var(--green-primary);
+            color: #ffffff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: background-color 0.2s ease;
+        }
+
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Contenedor principal */
+        main {
+            max-width: 1000px;
+            width: 90%;
+            margin: 2rem auto;
+            flex: 1;
+        }
+
+        /* Sistema de Mensajes de Django */
+        .mensajes {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .mensajes li {
+            padding: 0.85rem 1.2rem;
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border: 1px solid transparent;
+        }
+
+        .mensajes li.success {
+            background-color: var(--msg-success-bg);
+            color: var(--msg-success-text);
+            border-color: #c3e6cb;
+        }
+
+        .mensajes li.error {
+            background-color: var(--msg-error-bg);
+            color: var(--msg-error-text);
+            border-color: #f5c6cb;
+        }
+
+        .mensajes li.warning {
+            background-color: var(--msg-warning-bg);
+            color: var(--msg-warning-text);
+            border-color: #ffeeba;
+        }
+
+        .mensajes li.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border-color: #bee5eb;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
     <header>
         <h1>Gestión de Clientes</h1>
         <nav>
-            {# Enlace de navegación usando el nombre de la URL #}
             <a href="{% url 'lista_clientes' %}">Inicio</a>
         </nav>
     </header>
+
     <main>
-        {# Mostramos los mensajes generados con messages.success() / messages.error() #}
         {% if messages %}
             <ul class="mensajes">
                 {% for message in messages %}
-                    {# message.tags devuelve 'success', 'error', etc. según el tipo #}
                     <li class="{{ message.tags }}">{{ message }}</li>
                 {% endfor %}
             </ul>
         {% endif %}
 
-        {# Bloque principal que rellenan los templates hijos #}
         {% block contenido %}{% endblock %}
     </main>
 </body>

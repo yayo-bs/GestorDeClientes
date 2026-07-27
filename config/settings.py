@@ -116,3 +116,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Configuración de autenticación
+# URL a la que Django redirige si un usuario no autenticado intenta
+# acceder a una vista protegida con @login_required
+LOGIN_URL = 'login'
+
+# A dónde redirigir tras un login correcto
+LOGIN_REDIRECT_URL = 'lista_clientes'
+
+# A dónde redirigir tras hacer logout
+LOGOUT_REDIRECT_URL = 'lista_clientes'
