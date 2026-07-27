@@ -14,6 +14,16 @@
         </nav>
     </header>
     <main>
+        {# Mostramos los mensajes generados con messages.success() / messages.error() #}
+        {% if messages %}
+            <ul class="mensajes">
+                {% for message in messages %}
+                    {# message.tags devuelve 'success', 'error', etc. según el tipo #}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
         {# Bloque principal que rellenan los templates hijos #}
         {% block contenido %}{% endblock %}
     </main>

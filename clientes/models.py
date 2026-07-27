@@ -23,6 +23,10 @@ class Cliente(models.Model):
     activo = models.BooleanField(default=True)  # permite dar de baja sin borrar el registro
     actividad = models.CharField(max_length=20, choices=ACTIVIDADES, default='danza')
 
+    # null=True y blank=True porque los clientes ya existentes en la base de datos
+    # no tienen este dato, y no queremos obligar a rellenarlo siempre.
+    proxima_cita = models.DateField(null=True, blank=True)
+
     def __str__(self):
         # Representación legible del objeto en el admin
         return f"{self.nombre} {self.apellidos}"
