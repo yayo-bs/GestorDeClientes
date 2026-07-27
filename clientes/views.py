@@ -65,3 +65,19 @@ def editar_cliente(request, cliente_id):
         'cliente': cliente,
         'titulo': f'Editar cliente: {cliente}',
     })
+
+@login_required
+def eliminar_cliente(request, cliente_id):
+    # Buscamos el cliente; si no existe, 404 automático
+    cliente = get_object_or_404(Cliente, id=cliente_id)
+
+    if request.method == 'POST':
+        # Confirmación de eliminación: eliminamos el cliente
+        cliente.delete()
+        messages.success(request, f'Cliente "{cliente}" eliminado correctamente.')
+        return redirect('lista_clientes')
+
+    # Si es GET, mostramos la página de confirmación
+    return render(request, 'clientes/confirmar_eliminacion.html', {
+        'cliente': cliente,
+    })

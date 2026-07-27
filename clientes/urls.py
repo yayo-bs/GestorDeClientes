@@ -10,4 +10,6 @@ urlpatterns = [
     path('<int:cliente_id>/', views.detalle_cliente, name='detalle_cliente'),
     # URL para editar un cliente existente
     path('<int:cliente_id>/editar/', views.editar_cliente, name='editar_cliente'),
+    # URL para eliminar un cliente
+    path('<int:cliente_id>/eliminar/', views.eliminar_cliente, name='eliminar_cliente'),
 ]

@@ -13,7 +13,7 @@
         box-shadow: var(--shadow-sm);
     }
 
-    /* Cabecera con el nombre y badge opcional */
+    /* Cabecera con el nombre */
     .detalle-header {
         display: flex;
         justify-content: space-between;
@@ -68,6 +68,12 @@
         border-top: 1px solid #f0ebe1;
     }
 
+    .grupo-acciones {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+    }
+
     .btn-volver {
         display: inline-block;
         color: var(--text-muted);
@@ -102,6 +108,23 @@
         background-color: var(--green-hover);
         color: #ffffff;
     }
+
+    .btn-eliminar {
+        display: inline-block;
+        background-color: var(--msg-error-text);
+        color: #ffffff;
+        padding: 0.55rem 1.1rem;
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: background-color 0.2s ease;
+    }
+
+    .btn-eliminar:hover {
+        background-color: #58151c;
+        color: #ffffff;
+    }
 </style>
 
 <div class="card-detalle">
@@ -131,19 +154,24 @@
         </div>
 
         <div class="dato-item">
-        <span class="dato-label">Próxima cita</span>
-        <span class="dato-valor">
-            {% if cliente.proxima_cita %}
-                {{ cliente.proxima_cita|date:"d/m/Y" }}
-            {% else %}
-                <span style="color: var(--text-muted); font-style: italic;">Sin cita programada</span>
-            {% endif %}
-        </span>
+            <span class="dato-label">Próxima cita</span>
+            <span class="dato-valor">
+                {% if cliente.proxima_cita %}
+                    {{ cliente.proxima_cita|date:"d/m/Y" }}
+                {% else %}
+                    <span style="color: var(--text-muted); font-style: italic;">Sin cita programada</span>
+                {% endif %}
+            </span>
+        </div>
     </div>
 
     <div class="acciones">
         <a href="{% url 'lista_clientes' %}" class="btn-volver">← Volver al listado</a>
-        <a href="{% url 'editar_cliente' cliente.id %}" class="btn-editar">Editar cliente</a>
+        
+        <div class="grupo-acciones">
+            <a href="{% url 'editar_cliente' cliente.id %}" class="btn-editar">Editar cliente</a>
+            <a href="{% url 'eliminar_cliente' cliente.id %}" class="btn-eliminar">Eliminar cliente</a>
+        </div>
     </div>
 </div>
 {% endblock %}

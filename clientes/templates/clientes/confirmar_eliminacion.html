@@ -1,0 +1,95 @@
+{% extends 'clientes/base.html' %}
+
+{% block titulo %}Confirmar eliminación{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card-confirmacion {
+        background-color: var(--bg-card);
+        border: 1px solid var(--beige-accent);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+        max-width: 500px;
+        margin: 2rem auto;
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .card-confirmacion h2 {
+        color: var(--text-main);
+        font-size: 1.4rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .card-confirmacion p {
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    .cliente-info {
+        background-color: var(--bg-main);
+        border: 1px solid var(--beige-accent);
+        border-radius: var(--radius-sm);
+        padding: 0.85rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 1.75rem;
+    }
+
+    .acciones {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 0.6rem 1.25rem;
+        border-radius: var(--radius-sm);
+        font-weight: 500;
+        font-size: 0.95rem;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn-danger {
+        background-color: var(--msg-error-text);
+        color: #ffffff;
+    }
+
+    .btn-danger:hover {
+        background-color: #58151c;
+    }
+
+    .btn-secondary {
+        background-color: var(--beige-accent);
+        color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+        background-color: #d8cfbe;
+    }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="card-confirmacion">
+    <h2>¿Eliminar cliente?</h2>
+    <p>Esta acción no se puede deshacer. Se eliminarán permanentemente los datos del cliente:</p>
+
+    <div class="cliente-info">
+        {{ cliente }}
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="acciones">
+            <a href="{% url 'detalle_cliente' cliente.id %}" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
