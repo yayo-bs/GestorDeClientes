@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 
 from .models import Cliente
@@ -20,8 +21,8 @@ def lista_clientes(request):
     q = request.GET.get('q', '').strip()
     estado = request.GET.get('estado', 'activos')
 
-    # 2. Capturar y validar parámetros de ORDEN (?orden= Y ?dir=)
-    orden = request.GET.get('orden', 'nombre').lower()
+    # 2. Capturar y validar parámetros de ORDEN (?order= Y ?dir=)
+    orden = request.GET.get('order', 'nombre').lower()
     direccion = request.GET.get('dir', 'asc').lower()
 
     # Validar que el campo pertenezca a la lista blanca (por defecto 'nombre')
@@ -48,14 +49,26 @@ def lista_clientes(request):
     )
     clientes = clientes.order_by(criterio_orden)
 
+    # 5. Paginación (10 elementos por página)
+    paginator = Paginator(clientes, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # 6. Preservar parámetro GET (excluyendo 'page' para no duplicarlo)
+    querydict = request.GET.copy()
+    if 'page' in querydict:
+        del querydict['page']
+    url_params = querydict.urlencode() # Genera 'q=...&estado=...&order=...&dir=...'
+
     context = {
-        'clientes': clientes,
+        'page_obj': page_obj,
         'q': q,
         'estado': estado,
         'orden': orden,
         'direccion_activa': direccion,
         # Valor combinado para el <select> del template
         'orden_combina': f'{orden}_{direccion}',
+        'url_params': url_params, # Cadena con todos los filtros
     }
 
     # Pasamos los clientes al template mediante el contexto

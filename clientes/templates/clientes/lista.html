@@ -5,7 +5,6 @@
 {% block contenido %}
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
     <h2>Listado de Clientes</h2>
-    
     {% if user.is_authenticated %}
         <a href="{% url 'crear_cliente' %}" style="background-color: var(--green-primary); color: white; padding: 0.6rem 1.2rem; text-decoration: none; border-radius: var(--radius-sm); font-weight: 500;">
             + Añadir cliente
@@ -13,19 +12,15 @@
     {% endif %}
 </div>
 
-<!-- FORMULARIO DE BÚSQUEDA, FILTRO Y ORDEN -->
+<!-- FORMULARIO DE FILTROS -->
 <form method="get" action="{% url 'lista_clientes' %}" style="background-color: var(--bg-card); padding: 1.2rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
-    
-    <!-- Inputs ocultos que enviarán order y dir a Django -->
     <input type="hidden" name="order" id="id_order" value="{{ orden_activo }}">
     <input type="hidden" name="dir" id="id_dir" value="{{ direccion_activa }}">
 
-    <!-- 1. Búsqueda por texto (?q=) -->
     <div style="flex: 1; min-width: 200px;">
         <input type="text" name="q" value="{{ query }}" placeholder="Buscar por nombre o apellidos..." style="width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--beige-accent); border-radius: var(--radius-sm); font-size: 0.95rem; outline: none; background-color: var(--bg-main); color: var(--text-main);">
     </div>
 
-    <!-- 2. Filtro de Estado (?estado=) -->
     <div style="min-width: 150px;">
         <select name="estado" style="width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--beige-accent); border-radius: var(--radius-sm); font-size: 0.95rem; background-color: var(--bg-main); color: var(--text-main);">
             <option value="activos" {% if estado_seleccionado == 'activos' %}selected{% endif %}>Clientes activos</option>
@@ -34,7 +29,6 @@
         </select>
     </div>
 
-    <!-- 3. DESPLEGABLE DE ORDEN -->
     <div style="min-width: 180px;">
         <select id="select_orden" onchange="actualizarOrdenParametros(this.value)" style="width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--beige-accent); border-radius: var(--radius-sm); font-size: 0.95rem; background-color: var(--bg-main); color: var(--text-main);">
             <option value="nombre_asc" {% if orden_combina == 'nombre_asc' %}selected{% endif %}>Nombre (A - Z)</option>
@@ -55,7 +49,7 @@
     {% endif %}
 </form>
 
-<!-- TABLA LIMPIA (SIN ENLACES EN LOS ENCABEZADOS) -->
+<!-- TABLA -->
 <div style="background-color: var(--bg-card); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden;">
     <table style="width: 100%; border-collapse: collapse; text-align: left;">
         <thead>
@@ -66,33 +60,23 @@
             </tr>
         </thead>
         <tbody>
-            {% for cliente in clientes %}
+            <!-- Ahora iteramos sobre page_obj -->
+            {% for cliente in page_obj %}
             <tr style="border-bottom: 1px solid var(--beige-accent);">
                 <td style="padding: 1rem; font-weight: 500;">{{ cliente.nombre }}</td>
                 <td style="padding: 1rem; color: var(--text-main);">{{ cliente.apellidos }}</td>
                 <td style="padding: 1rem; text-align: right;">
-                    <a href="{% url 'detalle_cliente' cliente.pk %}" style="color: var(--green-primary); text-decoration: none; margin-right: 0.8rem; font-weight: 500;">
-                        Ver
-                    </a>
-
+                    <a href="{% url 'detalle_cliente' cliente.pk %}" style="color: var(--green-primary); text-decoration: none; margin-right: 0.8rem; font-weight: 500;">Ver</a>
                     {% if user.is_authenticated %}
-                        <a href="{% url 'editar_cliente' cliente.pk %}" style="color: var(--text-muted); text-decoration: none; margin-right: 0.8rem;">
-                            Editar
-                        </a>
-                        <a href="{% url 'eliminar_cliente' cliente.pk %}" style="color: var(--msg-error-text); text-decoration: none;">
-                            Borrar
-                        </a>
+                        <a href="{% url 'editar_cliente' cliente.pk %}" style="color: var(--text-muted); text-decoration: none; margin-right: 0.8rem;">Editar</a>
+                        <a href="{% url 'eliminar_cliente' cliente.pk %}" style="color: var(--msg-error-text); text-decoration: none;">Borrar</a>
                     {% endif %}
                 </td>
             </tr>
             {% empty %}
             <tr>
                 <td colspan="3" style="padding: 2rem; text-align: center; color: var(--text-muted);">
-                    {% if query %}
-                        No se encontraron clientes que coincidan con "{{ query }}".
-                    {% else %}
-                        No hay clientes registrados en esta categoría.
-                    {% endif %}
+                    No se encontraron clientes con los criterios seleccionados.
                 </td>
             </tr>
             {% endfor %}
@@ -100,7 +84,56 @@
     </table>
 </div>
 
-<!-- JS auxiliar para separar valor del select en order y dir -->
+<!-- CONTROLES DE PAGINACIÓN -->
+{% if page_obj.has_other_pages %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; background-color: var(--bg-card); padding: 1rem 1.5rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+    
+    <span style="font-size: 0.9rem; color: var(--text-muted);">
+        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+    </span>
+
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <!-- Botón Anterior -->
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if url_params %}&{{ url_params }}{% endif %}" 
+               style="padding: 0.5rem 0.9rem; background-color: var(--bg-main); border: 1px solid var(--beige-accent); border-radius: var(--radius-sm); color: var(--text-main); text-decoration: none; font-size: 0.9rem;">
+                &laquo; Anterior
+            </a>
+        {% else %}
+            <span style="padding: 0.5rem 0.9rem; background-color: var(--bg-main); border: 1px solid var(--beige-accent); border-radius: var(--radius-sm); color: var(--text-muted); font-size: 0.9rem; opacity: 0.6; cursor: not-allowed;">
+                &laquo; Anterior
+            </span>
+        {% endif %}
+
+        <!-- Números de página -->
+        {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+                <span style="padding: 0.5rem 0.9rem; background-color: var(--green-primary); color: white; border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: bold;">
+                    {{ i }}
+                </span>
+            {% else %}
+                <a href="?page={{ i }}{% if url_params %}&{{ url_params }}{% endif %}" 
+                   style="padding: 0.5rem 0.9rem; background-color: var(--bg-main); border: 1px solid var(--beige-accent); border-radius: var(--radius-sm); color: var(--text-main); text-decoration: none; font-size: 0.9rem;">
+                    {{ i }}
+                </a>
+            {% endif %}
+        {% endfor %}
+
+        <!-- Botón Siguiente -->
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if url_params %}&{{ url_params }}{% endif %}" 
+               style="padding: 0.5rem 0.9rem; background-color: var(--bg-main); border: 1px solid var(--beige-accent); border-radius: var(--radius-sm); color: var(--text-main); text-decoration: none; font-size: 0.9rem;">
+                Siguiente &raquo;
+            </a>
+        {% else %}
+            <span style="padding: 0.5rem 0.9rem; background-color: var(--bg-main); border: 1px solid var(--beige-accent); border-radius: var(--radius-sm); color: var(--text-muted); font-size: 0.9rem; opacity: 0.6; cursor: not-allowed;">
+                Siguiente &raquo;
+            </span>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
 <script>
 function actualizarOrdenParametros(valor) {
     const partes = valor.split('_');
