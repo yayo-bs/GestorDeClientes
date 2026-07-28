@@ -7,6 +7,10 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Cliente
 from .forms import ClienteForm
 
+ORDEN_CAMPOS_PERMITIDOS = {
+    'nombre': 'nombre',
+    'apellidos': 'apellidos',
+}
 
 def lista_clientes(request):
     # Base inicial: recuperamos todos los clientes
@@ -16,23 +20,42 @@ def lista_clientes(request):
     q = request.GET.get('q', '').strip()
     estado = request.GET.get('estado', 'activos')
 
-    # 2. Aplicar filtro adicional (?estado=)
+    # 2. Capturar y validar parámetros de ORDEN (?orden= Y ?dir=)
+    orden = request.GET.get('orden', 'nombre').lower()
+    direccion = request.GET.get('dir', 'asc').lower()
+
+    # Validar que el campo pertenezca a la lista blanca (por defecto 'nombre')
+    campo_orden = ORDEN_CAMPOS_PERMITIDOS.get(orden, 'nombre')
+
+    # Validar dirección (por defecto 'asc')
+    if direccion not in ['asc', 'desc']:
+        direccion = 'asc'
+
+    # 3. Aplicar filtro adicional (?estado=) y busqueda por texto
     if estado == 'activos':
         clientes = clientes.filter(activo=True)
     elif estado == 'inactivos':
         clientes = clientes.filter(activo=False)
-    # Si estado es 'todos' o cualquier otro valor, no filtramos por activo/inactivo
 
-    # 3. Aplicar búsqueda por texto (?q=) sobre nombre o apellidos
     if q:
         clientes = clientes.filter(
             Q(nombre__icontains=q) | Q(apellidos__icontains=q)
         )
 
+    # 4. Aplicar ordenamiento
+    criterio_orden = (
+        f'-{campo_orden}' if direccion == 'desc' else campo_orden
+    )
+    clientes = clientes.order_by(criterio_orden)
+
     context = {
         'clientes': clientes,
         'q': q,
         'estado': estado,
+        'orden': orden,
+        'direccion_activa': direccion,
+        # Valor combinado para el <select> del template
+        'orden_combina': f'{orden}_{direccion}',
     }
 
     # Pasamos los clientes al template mediante el contexto

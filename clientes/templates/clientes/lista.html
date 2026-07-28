@@ -6,7 +6,6 @@
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
     <h2>Listado de Clientes</h2>
     
-    {# 1. El botón de añadir solo aparece si el usuario está autenticado #}
     {% if user.is_authenticated %}
         <a href="{% url 'crear_cliente' %}" style="background-color: var(--green-primary); color: white; padding: 0.6rem 1.2rem; text-decoration: none; border-radius: var(--radius-sm); font-weight: 500;">
             + Añadir cliente
@@ -14,16 +13,20 @@
     {% endif %}
 </div>
 
-<!-- FORMULARIO DE BÚSQUEDA Y FILTROS -->
+<!-- FORMULARIO DE BÚSQUEDA, FILTRO Y ORDEN -->
 <form method="get" action="{% url 'lista_clientes' %}" style="background-color: var(--bg-card); padding: 1.2rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
     
-    <!-- Input de Búsqueda Texto (?q=) -->
-    <div style="flex: 1; min-width: 220px;">
+    <!-- Inputs ocultos que enviarán order y dir a Django -->
+    <input type="hidden" name="order" id="id_order" value="{{ orden_activo }}">
+    <input type="hidden" name="dir" id="id_dir" value="{{ direccion_activa }}">
+
+    <!-- 1. Búsqueda por texto (?q=) -->
+    <div style="flex: 1; min-width: 200px;">
         <input type="text" name="q" value="{{ query }}" placeholder="Buscar por nombre o apellidos..." style="width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--beige-accent); border-radius: var(--radius-sm); font-size: 0.95rem; outline: none; background-color: var(--bg-main); color: var(--text-main);">
     </div>
 
-    <!-- Desplegable de Estado (?estado=) -->
-    <div style="min-width: 160px;">
+    <!-- 2. Filtro de Estado (?estado=) -->
+    <div style="min-width: 150px;">
         <select name="estado" style="width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--beige-accent); border-radius: var(--radius-sm); font-size: 0.95rem; background-color: var(--bg-main); color: var(--text-main);">
             <option value="activos" {% if estado_seleccionado == 'activos' %}selected{% endif %}>Clientes activos</option>
             <option value="inactivos" {% if estado_seleccionado == 'inactivos' %}selected{% endif %}>Clientes inactivos</option>
@@ -31,20 +34,28 @@
         </select>
     </div>
 
-    <!-- Botón Submit -->
+    <!-- 3. DESPLEGABLE DE ORDEN -->
+    <div style="min-width: 180px;">
+        <select id="select_orden" onchange="actualizarOrdenParametros(this.value)" style="width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--beige-accent); border-radius: var(--radius-sm); font-size: 0.95rem; background-color: var(--bg-main); color: var(--text-main);">
+            <option value="nombre_asc" {% if orden_combina == 'nombre_asc' %}selected{% endif %}>Nombre (A - Z)</option>
+            <option value="nombre_desc" {% if orden_combina == 'nombre_desc' %}selected{% endif %}>Nombre (Z - A)</option>
+            <option value="apellidos_asc" {% if orden_combina == 'apellidos_asc' %}selected{% endif %}>Apellidos (A - Z)</option>
+            <option value="apellidos_desc" {% if orden_combina == 'apellidos_desc' %}selected{% endif %}>Apellidos (Z - A)</option>
+        </select>
+    </div>
+
     <button type="submit" style="background-color: var(--green-primary); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: var(--radius-sm); font-weight: 500; cursor: pointer;">
-        Buscar
+        Filtrar
     </button>
 
-    <!-- Botón para limpiar filtros -->
-    {% if query or estado_seleccionado != 'activos' %}
+    {% if query or estado_seleccionado != 'activos' or orden_activo != 'nombre' or direccion_activa != 'asc' %}
         <a href="{% url 'lista_clientes' %}" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">
             Limpiar filtros
         </a>
     {% endif %}
 </form>
 
-<!-- TABLA DE RESULTADOS -->
+<!-- TABLA LIMPIA (SIN ENLACES EN LOS ENCABEZADOS) -->
 <div style="background-color: var(--bg-card); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden;">
     <table style="width: 100%; border-collapse: collapse; text-align: left;">
         <thead>
@@ -60,12 +71,10 @@
                 <td style="padding: 1rem; font-weight: 500;">{{ cliente.nombre }}</td>
                 <td style="padding: 1rem; color: var(--text-main);">{{ cliente.apellidos }}</td>
                 <td style="padding: 1rem; text-align: right;">
-                    {# La vista de detalle siempre es pública #}
                     <a href="{% url 'detalle_cliente' cliente.pk %}" style="color: var(--green-primary); text-decoration: none; margin-right: 0.8rem; font-weight: 500;">
                         Ver
                     </a>
 
-                    {# 2. Las acciones de editar y eliminar solo para usuarios autenticados #}
                     {% if user.is_authenticated %}
                         <a href="{% url 'editar_cliente' cliente.pk %}" style="color: var(--text-muted); text-decoration: none; margin-right: 0.8rem;">
                             Editar
@@ -90,4 +99,13 @@
         </tbody>
     </table>
 </div>
+
+<!-- JS auxiliar para separar valor del select en order y dir -->
+<script>
+function actualizarOrdenParametros(valor) {
+    const partes = valor.split('_');
+    document.getElementById('id_order').value = partes[0];
+    document.getElementById('id_dir').value = partes[1];
+}
+</script>
 {% endblock %}
