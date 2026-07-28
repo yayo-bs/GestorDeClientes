@@ -62,9 +62,9 @@ def lista_clientes(request):
 
     context = {
         'page_obj': page_obj,
-        'q': q,
-        'estado': estado,
-        'orden': orden,
+        'query': q,
+        'estado_seleccionado': estado,
+        'orden_activo': orden,
         'direccion_activa': direccion,
         # Valor combinado para el <select> del template
         'orden_combina': f'{orden}_{direccion}',
