@@ -1,19 +1,43 @@
-from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from django.shortcuts import render, get_object_or_404, redirect
+
 from .models import Cliente
 from .forms import ClienteForm
 
 
-@login_required
 def lista_clientes(request):
-    # Recuperamos solo los clientes activos de la base de datos
-    clientes = Cliente.objects.filter(activo=True)  # Solo clientes activos
-    # Pasamos los clientes al template mediante el contexto
-    return render(request, 'clientes/lista.html', {'clientes': clientes})
+    # Base inicial: recuperamos todos los clientes
+    clientes = Cliente.objects.all()
 
-@login_required
+    # 1. Obtener parámetros GET de la URL
+    q = request.GET.get('q', '').strip()
+    estado = request.GET.get('estado', 'activos')
+
+    # 2. Aplicar filtro adicional (?estado=)
+    if estado == 'activos':
+        clientes = clientes.filter(activo=True)
+    elif estado == 'inactivos':
+        clientes = clientes.filter(activo=False)
+    # Si estado es 'todos' o cualquier otro valor, no filtramos por activo/inactivo
+
+    # 3. Aplicar búsqueda por texto (?q=) sobre nombre o apellidos
+    if q:
+        clientes = clientes.filter(
+            Q(nombre__icontains=q) | Q(apellidos__icontains=q)
+        )
+
+    context = {
+        'clientes': clientes,
+        'q': q,
+        'estado': estado,
+    }
+
+    # Pasamos los clientes al template mediante el contexto
+    return render(request, 'clientes/lista.html', context)
+
 def detalle_cliente(request, cliente_id):
     # Buscamos el cliente por ID; si no existe, devuelve error 404 automáticamente
     cliente = get_object_or_404(Cliente, id=cliente_id)

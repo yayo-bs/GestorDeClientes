@@ -120,7 +120,7 @@ STATIC_URL = 'static/'
 # Configuración de autenticación
 # URL a la que Django redirige si un usuario no autenticado intenta
 # acceder a una vista protegida con @login_required
-LOGIN_URL = 'login'
+LOGIN_URL = '/'
 
 # A dónde redirigir tras un login correcto
 LOGIN_REDIRECT_URL = 'lista_clientes'

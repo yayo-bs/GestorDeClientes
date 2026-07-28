@@ -12,12 +12,12 @@
             --bg-card: #ffffff;          /* Blanco cálido para tarjetas o contenedores */
             --text-main: #2d332d;        /* Verde muy oscuro casi negro para texto */
             --text-muted: #5e665e;       /* Gris verdoso para textos secundarios */
-            
+        
             --green-primary: #2e5a44;    /* Verde bosque / oliva profundo */
             --green-hover: #224332;      /* Verde más oscuro para estados hover */
             --green-accent: #88a782;     /* Verde suave para detalles y bordes */
             --beige-accent: #e8e2d5;     /* Beige medio para bordes y separadores */
-            
+        
             /* Mensajes de Django */
             --msg-success-bg: #e2f0d9;
             --msg-success-text: #1b4317;
@@ -66,7 +66,15 @@
             letter-spacing: -0.02em;
         }
 
-        nav a {
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Compartimos estilos entre los enlaces 'a' y el botón '.btn-logout' */
+        nav a,
+        .btn-logout {
             color: #ffffff;
             text-decoration: none;
             font-weight: 500;
@@ -77,8 +85,15 @@
             transition: background-color 0.2s ease;
         }
 
-        nav a:hover {
+        nav a:hover,
+        .btn-logout:hover {
             background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-logout {
+            border: none;
+            font-family: inherit;
+            cursor: pointer;
         }
 
         /* Contenedor principal */
@@ -127,6 +142,7 @@
             color: #0c5460;
             border-color: #bee5eb;
         }
+
     </style>
     
     {% block extra_css %}{% endblock %}
@@ -135,7 +151,19 @@
     <header>
         <h1>Gestión de Clientes</h1>
         <nav>
+            {# Enlace siempre visible al listado público #}
             <a href="{% url 'lista_clientes' %}">Inicio</a>
+
+            {% if user.is_authenticated %}
+                {# Si está logueado, muestra el botón de cerrar sesión #}
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-logout">Cerrar sesión</button>
+                </form>
+            {% else %}
+                {# Si es anónimo, muestra el enlace de iniciar sesión #}
+                <a href="{% url 'login' %}">Iniciar sesión</a>
+            {% endif %}
         </nav>
     </header>
 

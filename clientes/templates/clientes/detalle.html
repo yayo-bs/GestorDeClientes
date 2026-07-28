@@ -166,12 +166,16 @@
     </div>
 
     <div class="acciones">
+        {# El botón volver siempre es visible para cualquier usuario #}
         <a href="{% url 'lista_clientes' %}" class="btn-volver">← Volver al listado</a>
         
-        <div class="grupo-acciones">
-            <a href="{% url 'editar_cliente' cliente.id %}" class="btn-editar">Editar cliente</a>
-            <a href="{% url 'eliminar_cliente' cliente.id %}" class="btn-eliminar">Eliminar cliente</a>
-        </div>
+        {# Solo mostramos las acciones de edición/eliminación a usuarios logueados #}
+        {% if user.is_authenticated %}
+            <div class="grupo-acciones">
+                <a href="{% url 'editar_cliente' cliente.id %}" class="btn-editar">Editar cliente</a>
+                <a href="{% url 'eliminar_cliente' cliente.id %}" class="btn-eliminar">Eliminar cliente</a>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

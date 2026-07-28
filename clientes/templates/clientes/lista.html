@@ -1,134 +1,93 @@
 {% extends 'clientes/base.html' %}
 
-{% block titulo %}Listado de clientes{% endblock %}
+{% block titulo %}Lista de Clientes{% endblock %}
 
 {% block contenido %}
-<style>
-    /* Cabecera con título y botón principal */
-    .lista-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-
-    .lista-header h2 {
-        color: var(--green-primary);
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-
-    .btn-crear {
-        display: inline-block;
-        background-color: var(--green-primary);
-        color: #ffffff;
-        padding: 0.6rem 1.2rem;
-        border-radius: var(--radius-sm);
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 0.9rem;
-        transition: background-color 0.2s ease;
-    }
-
-    .btn-crear:hover {
-        background-color: var(--green-hover);
-        color: #ffffff;
-    }
-
-    /* Contenedor y tabla de clientes */
-    .tabla-contenedor {
-        background-color: var(--bg-card);
-        border: 1px solid var(--beige-accent);
-        border-radius: var(--radius-md);
-        box-shadow: var(--shadow-sm);
-        overflow: hidden;
-    }
-
-    .tabla-clientes {
-        width: 100%;
-        border-collapse: collapse;
-        text-align: left;
-    }
-
-    .tabla-clientes th {
-        background-color: #f0ebe1;
-        color: var(--text-muted);
-        font-size: 0.825rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        padding: 1rem 1.25rem;
-        border-bottom: 1px solid var(--beige-accent);
-    }
-
-    .tabla-clientes td {
-        padding: 1rem 1.25rem;
-        border-bottom: 1px solid #f0ebe1;
-        font-size: 0.95rem;
-    }
-
-    .tabla-clientes tr:last-child td {
-        border-bottom: none;
-    }
-
-    .tabla-clientes tr:hover {
-        background-color: #faf8f5;
-    }
-
-    .enlace-cliente {
-        color: var(--green-primary);
-        font-weight: 600;
-        text-decoration: none;
-        transition: color 0.2s ease;
-    }
-
-    .enlace-cliente:hover {
-        color: var(--green-hover);
-        text-decoration: underline;
-    }
-
-    /* Estilo para lista vacía */
-    .lista-vacia {
-        padding: 3rem 1.5rem;
-        text-align: center;
-        color: var(--text-muted);
-    }
-</style>
-
-<div class="lista-header">
-    <h2>Clientes</h2>
-    <a href="{% url 'crear_cliente' %}" class="btn-crear">+ Crear nuevo cliente</a>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h2>Listado de Clientes</h2>
+    
+    {# 1. El botón de añadir solo aparece si el usuario está autenticado #}
+    {% if user.is_authenticated %}
+        <a href="{% url 'crear_cliente' %}" style="background-color: var(--green-primary); color: white; padding: 0.6rem 1.2rem; text-decoration: none; border-radius: var(--radius-sm); font-weight: 500;">
+            + Añadir cliente
+        </a>
+    {% endif %}
 </div>
 
-<div class="tabla-contenedor">
-    {% if clientes %}
-        <table class="tabla-clientes">
-            <thead>
-                <tr>
-                    <th>Nombre y Apellidos</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cliente in clientes %}
-                    <tr>
-                        <td>
-                            <a href="{% url 'detalle_cliente' cliente.id %}" class="enlace-cliente">
-                                {{ cliente.nombre }} {{ cliente.apellidos }}
-                            </a>
-                        </td>
-                        <td>
-                            <a href="{% url 'detalle_cliente' cliente.id %}" class="enlace-cliente" style="font-weight: 500; font-size: 0.85rem;">
-                                Ver detalle →
-                            </a>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <div class="lista-vacia">
-            <p>No hay clientes registrados aún.</p>
-        </div>
+<!-- FORMULARIO DE BÚSQUEDA Y FILTROS -->
+<form method="get" action="{% url 'lista_clientes' %}" style="background-color: var(--bg-card); padding: 1.2rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+    
+    <!-- Input de Búsqueda Texto (?q=) -->
+    <div style="flex: 1; min-width: 220px;">
+        <input type="text" name="q" value="{{ query }}" placeholder="Buscar por nombre o apellidos..." style="width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--beige-accent); border-radius: var(--radius-sm); font-size: 0.95rem; outline: none; background-color: var(--bg-main); color: var(--text-main);">
+    </div>
+
+    <!-- Desplegable de Estado (?estado=) -->
+    <div style="min-width: 160px;">
+        <select name="estado" style="width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--beige-accent); border-radius: var(--radius-sm); font-size: 0.95rem; background-color: var(--bg-main); color: var(--text-main);">
+            <option value="activos" {% if estado_seleccionado == 'activos' %}selected{% endif %}>Clientes activos</option>
+            <option value="inactivos" {% if estado_seleccionado == 'inactivos' %}selected{% endif %}>Clientes inactivos</option>
+            <option value="todos" {% if estado_seleccionado == 'todos' %}selected{% endif %}>Todos los clientes</option>
+        </select>
+    </div>
+
+    <!-- Botón Submit -->
+    <button type="submit" style="background-color: var(--green-primary); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: var(--radius-sm); font-weight: 500; cursor: pointer;">
+        Buscar
+    </button>
+
+    <!-- Botón para limpiar filtros -->
+    {% if query or estado_seleccionado != 'activos' %}
+        <a href="{% url 'lista_clientes' %}" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">
+            Limpiar filtros
+        </a>
     {% endif %}
+</form>
+
+<!-- TABLA DE RESULTADOS -->
+<div style="background-color: var(--bg-card); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+            <tr style="background-color: var(--beige-accent); color: var(--text-main);">
+                <th style="padding: 1rem;">Nombre</th>
+                <th style="padding: 1rem;">Apellidos</th>
+                <th style="padding: 1rem; text-align: right;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cliente in clientes %}
+            <tr style="border-bottom: 1px solid var(--beige-accent);">
+                <td style="padding: 1rem; font-weight: 500;">{{ cliente.nombre }}</td>
+                <td style="padding: 1rem; color: var(--text-main);">{{ cliente.apellidos }}</td>
+                <td style="padding: 1rem; text-align: right;">
+                    {# La vista de detalle siempre es pública #}
+                    <a href="{% url 'detalle_cliente' cliente.pk %}" style="color: var(--green-primary); text-decoration: none; margin-right: 0.8rem; font-weight: 500;">
+                        Ver
+                    </a>
+
+                    {# 2. Las acciones de editar y eliminar solo para usuarios autenticados #}
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'editar_cliente' cliente.pk %}" style="color: var(--text-muted); text-decoration: none; margin-right: 0.8rem;">
+                            Editar
+                        </a>
+                        <a href="{% url 'eliminar_cliente' cliente.pk %}" style="color: var(--msg-error-text); text-decoration: none;">
+                            Borrar
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                    {% if query %}
+                        No se encontraron clientes que coincidan con "{{ query }}".
+                    {% else %}
+                        No hay clientes registrados en esta categoría.
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

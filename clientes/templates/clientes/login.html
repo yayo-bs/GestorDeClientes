@@ -102,6 +102,26 @@
     .btn-login:hover {
         background-color: var(--green-hover);
     }
+
+    /* Zona inferior para acceso público */
+    .login-footer {
+        margin-top: 1.75rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--beige-accent);
+        text-align: center;
+    }
+
+    .btn-publico {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }
+
+    .btn-publico:hover {
+        color: var(--green-hover);
+    }
 </style>
 {% endblock %}
 
@@ -134,6 +154,13 @@
 
             <button type="submit" class="btn-login">Iniciar Sesión</button>
         </form>
+
+        <!-- Enlace al listado público de clientes -->
+        <div class="login-footer">
+            <a href="{% url 'lista_clientes' %}" class="btn-publico">
+                Ver listado público de clientes →
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}
