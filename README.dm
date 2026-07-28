@@ -27,7 +27,7 @@ Sigue estos pasos para desplegar la aplicación en tu entorno local:
 
 ### 1. Clonar el repositorio e ingresar al directorio
 `git clone https://github.com/yayo-bs/GestorDeClientes`
-`cd M5T1_Eduardo_Bustamante_Sánchez`
+`cd M5T2_Eduardo_Bustamante_Sánchez`
 
 ### 2. Crear y activar el entorno virtual
 - **En Windows (PowerShell / CMD):**
